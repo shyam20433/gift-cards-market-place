@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Gift Card Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .home-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .home-title {
+        font-size: 2.5rem;
+        color: #2d3748;
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 2.5rem;
+        position: relative;
+    }
+
+    .home-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+        border-radius: 2px;
+    }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .flip-card {
+        width: 100%;
+        height: 420px;
+        perspective: 1000px;
+        position: relative;
+    }
+
+    .flip-inner {
+        width: 100%;
+        height: 100%;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+        position: relative;
+    }
+
+    .flipped {
+        transform: rotateY(180deg);
+    }
+
+    .flip-front,
+    .flip-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        backface-visibility: hidden;
+        border-radius: 16px;
+        overflow: hidden;
+        padding: 2rem;
+        box-sizing: border-box;
+    }
+
+    .flip-front {
+        background: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        z-index: 2;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .flip-card:hover .flip-front {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .flip-card:hover .flip-front::before {
+        opacity: 0.1;
+    }
+
+    .flip-front::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #3b82f6, #10b981, #3b82f6);
+        background-size: 400%;
+        z-index: -1;
+        border-radius: 16px;
+        opacity: 0;
+        transition: 0.5s;
+        animation: gradient 8s linear infinite;
+    }
+
+    .flip-back {
+        transform: rotateY(180deg);
+        background: #f9fafb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: #2d3748;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .card-name {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #1a202c;
+    }
+
+    .card-platform {
+        background: linear-gradient(to right, #3b82f6, #6366f1);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
+    }
+
+    .card-price {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #10b981;
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-price::before {
+        content: '₹';
+        font-size: 1.5rem;
+        margin-right: 4px;
+    }
+
+    .card-details {
+        font-size: 0.95rem;
+        color: #4a5568;
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-details strong {
+        color: #2d3748;
+        margin-right: 6px;
+        min-width: 90px;
+        display: inline-block;
+    }
+
+    .card-details svg {
+        margin-right: 8px;
+        color: #718096;
+        width: 18px;
+    }
+
+    .card-expiry {
+        font-size: 0.95rem;
+        color: #ef4444;
+        font-weight: 500;
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-expiry svg {
+        margin-right: 8px;
+        color: #ef4444;
+        width: 18px;
+    }
+
+    .purchase-btn {
+        width: 100%;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+        border: none;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .purchase-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        color: white;
+    }
+
+    .purchase-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .flip-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .flip-btn:hover {
+        background: white;
+        transform: scale(1.1);
+    }
+
+    .loading {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+
+    .no-cards {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+
+    .no-cards h3 {
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <h1 class="home-title">Gift Card Marketplace</h1>
+    
+    {% if cards %}
+    <div class="cards-grid">
+        {% for card in cards %}
+        <div class="flip-card" data-card-id="{{ card._id }}">
+            <div class="flip-inner">
+                <div class="flip-front">
+                    <button class="flip-btn" onclick="toggleFlip('{{ card._id }}')">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    
+                    <div class="card-header">
+                        <div class="card-name">{{ card.card_name }}</div>
+                        <div class="card-platform">{{ card.platform }}</div>
+                    </div>
+                    
+                    <div class="card-price">{{ card.price }}</div>
+                    
+                    <div class="card-details">
+                        <i class="fas fa-user"></i>
+                        <strong>Owner:</strong> {{ card.owner_name }}
+                    </div>
+                    
+                    <div class="card-details">
+                        <i class="fas fa-phone"></i>
+                        <strong>Phone:</strong> {{ card.owner_phone }}
+                    </div>
+                    
+                    <div class="card-expiry">
+                        <i class="fas fa-clock"></i>
+                        <strong>Expires:</strong> {{ card.expiry_date }}
+                    </div>
+                    
+                    {% if session.user_id and session.user_id != card.owner_id %}
+                    <button class="purchase-btn" onclick="purchaseCard('{{ card._id }}')">
+                        <i class="fas fa-shopping-cart me-2"></i>Purchase Now
+                    </button>
+                    {% elif not session.user_id %}
+                    <button class="purchase-btn" onclick="window.location.href='{{ url_for('login') }}'">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login to Purchase
+                    </button>
+                    {% else %}
+                    <button class="purchase-btn" disabled>
+                        <i class="fas fa-user me-2"></i>Your Card
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <div class="flip-back">
+                    <div>
+                        <h4>Card Details</h4>
+                        <p><strong>Description:</strong></p>
+                        <p>{{ card.discount_description or 'No description available' }}</p>
+                        <p><strong>UPI ID:</strong> {{ card.owner_upi_id or 'Not provided' }}</p>
+                        <p><strong>Uploaded:</strong> {{ card.created_at.strftime('%B %d, %Y') if card.created_at else 'Unknown' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-cards">
+        <h3>No Gift Cards Available</h3>
+        <p>Check back later for new gift cards or upload your own!</p>
+        {% if session.user_id %}
+        <a href="{{ url_for('upload_card') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Upload Your First Gift Card
+        </a>
+        {% else %}
+        <a href="{{ url_for('signup') }}" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Join Now
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleFlip(cardId) {
+    const card = document.querySelector(`[data-card-id="${cardId}"] .flip-inner`);
+    card.classList.toggle('flipped');
+}
+
+function purchaseCard(cardId) {
+    if (confirm('Are you sure you want to purchase this gift card?')) {
+        window.location.href = `/purchase/${cardId}`;
+    }
+}
+</script>
+{% endblock %} 

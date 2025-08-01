@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Gift Card Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .signup-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+    }
+
+    .signup-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        width: 100%;
+        max-width: 500px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .signup-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+    }
+
+    .signup-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .signup-header h2 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .signup-header p {
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #374151;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-control.error {
+        border-color: #ef4444;
+    }
+
+    .error-message {
+        color: #ef4444;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .signup-btn {
+        width: 100%;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+        border: none;
+        color: white;
+        padding: 0.875rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .signup-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .signup-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .divider {
+        text-align: center;
+        margin: 2rem 0;
+        position: relative;
+    }
+
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e5e7eb;
+    }
+
+    .divider span {
+        background: white;
+        padding: 0 1rem;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .login-link a {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    .social-signup {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        background: white;
+        color: #374151;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .social-btn:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+        transform: translateY(-1px);
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .strength-bar {
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 2px;
+        margin-top: 0.25rem;
+        overflow: hidden;
+    }
+
+    .strength-fill {
+        height: 100%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .strength-weak { background: #ef4444; width: 25%; }
+    .strength-fair { background: #f59e0b; width: 50%; }
+    .strength-good { background: #10b981; width: 75%; }
+    .strength-strong { background: #059669; width: 100%; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="signup-container">
+    <div class="signup-card">
+        <div class="signup-header">
+            <h2>Create Account</h2>
+            <p>Join our gift card marketplace today</p>
+        </div>
+
+        <form method="POST" id="signupForm">
+            <div class="form-group">
+                <label for="username" class="form-label">Full Name</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+                <div class="error-message" id="usernameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+                <div class="error-message" id="passwordError"></div>
+                <div class="password-strength">
+                    <div id="strengthText">Password strength: <span id="strengthLabel">Weak</span></div>
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and <a href="#" onclick="showPrivacy()">Privacy Policy</a>
+                </label>
+                <div class="error-message" id="termsError"></div>
+            </div>
+
+            <button type="submit" class="signup-btn" id="submitBtn">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>or sign up with</span>
+        </div>
+
+        <div class="social-signup">
+            <button class="social-btn" onclick="socialSignup('google')">
+                <i class="fab fa-google"></i>
+                Google
+            </button>
+            <button class="social-btn" onclick="socialSignup('facebook')">
+                <i class="fab fa-facebook-f"></i>
+                Facebook
+            </button>
+        </div>
+
+        <div class="login-link">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    clearErrors();
+    
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const terms = document.getElementById('terms').checked;
+    
+    let isValid = true;
+    
+    if (!username) {
+        showError('username', 'Full name is required');
+        isValid = false;
+    } else if (username.length < 2) {
+        showError('username', 'Full name must be at least 2 characters');
+        isValid = false;
+    }
+    
+    if (!email) {
+        showError('email', 'Email is required');
+        isValid = false;
+    } else if (!isValidEmail(email)) {
+        showError('email', 'Please enter a valid email');
+        isValid = false;
+    }
+    
+    if (!password) {
+        showError('password', 'Password is required');
+        isValid = false;
+    } else if (password.length < 6) {
+        showError('password', 'Password must be at least 6 characters');
+        isValid = false;
+    }
+    
+    if (!confirmPassword) {
+        showError('confirmPassword', 'Please confirm your password');
+        isValid = false;
+    } else if (password !== confirmPassword) {
+        showError('confirmPassword', 'Passwords do not match');
+        isValid = false;
+    }
+    
+    if (!terms) {
+        showError('terms', 'You must agree to the terms and conditions');
+        isValid = false;
+    }
+    
+    if (isValid) {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+        
+        this.submit();
+    }
+});
+
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthLabel = document.getElementById('strengthLabel');
+    
+    let strength = 0;
+    let label = 'Weak';
+    
+    if (password.length >= 6) strength += 25;
+    if (password.length >= 8) strength += 25;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
+    if (/[0-9]/.test(password)) strength += 25;
+    
+    if (strength >= 100) {
+        label = 'Strong';
+        strengthFill.className = 'strength-fill strength-strong';
+    } else if (strength >= 75) {
+        label = 'Good';
+        strengthFill.className = 'strength-fill strength-good';
+    } else if (strength >= 50) {
+        label = 'Fair';
+        strengthFill.className = 'strength-fill strength-fair';
+    } else {
+        label = 'Weak';
+        strengthFill.className = 'strength-fill strength-weak';
+    }
+    
+    strengthLabel.textContent = label;
+});
+
+function showError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(fieldId + 'Error');
+    
+    field.classList.add('error');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+function clearErrors() {
+    const fields = ['username', 'email', 'password', 'confirmPassword', 'terms'];
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId + 'Error');
+        
+        if (field) field.classList.remove('error');
+        if (errorDiv) errorDiv.style.display = 'none';
+    });
+}
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function socialSignup(provider) {
+    alert(`${provider} signup functionality will be implemented soon!`);
+}
+
+function showTerms() {
+    alert('Terms of Service will be displayed here.');
+}
+
+function showPrivacy() {
+    alert('Privacy Policy will be displayed here.');
+}
+</script>
+{% endblock %} 

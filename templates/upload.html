@@ -1,0 +1,546 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Gift Card - Gift Card Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .upload-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .upload-header h1 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-header p {
+        color: #6b7280;
+        font-size: 1.1rem;
+    }
+
+    .upload-form {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .upload-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+    }
+
+    .form-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #374151;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-control.error {
+        border-color: #ef4444;
+    }
+
+    .error-message {
+        color: #ef4444;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .file-upload {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .file-upload input[type=file] {
+        position: absolute;
+        left: -9999px;
+    }
+
+    .file-upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        border: 2px dashed #d1d5db;
+        border-radius: 10px;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .file-upload-label:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .file-upload-label.has-file {
+        border-color: #10b981;
+        background: #ecfdf5;
+    }
+
+    .file-upload-icon {
+        font-size: 2rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+
+    .file-upload-text {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .file-upload-text.has-file {
+        color: #10b981;
+        font-weight: 500;
+    }
+
+    .preview-image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 10px;
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .upload-btn {
+        width: 100%;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .upload-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .platform-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .platform-option {
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .platform-option:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .platform-option.selected {
+        border-color: #3b82f6;
+        background: #eff6ff;
+        color: #3b82f6;
+    }
+
+    .platform-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .help-text {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .upload-container {
+            padding: 1rem;
+        }
+        
+        .upload-form {
+            padding: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <div class="upload-header">
+        <h1>Upload Your Gift Card</h1>
+        <p>Share your gift card with the community and earn money</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="uploadForm" class="upload-form">
+        <!-- Card Information -->
+        <div class="form-section">
+            <h3 class="section-title">Card Information</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name" class="form-label">Card Name *</label>
+                    <input type="text" id="name" name="name" class="form-control" required>
+                    <div class="error-message" id="nameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="source" class="form-label">Platform/Source *</label>
+                    <input type="text" id="source" name="source" class="form-control" required>
+                    <div class="error-message" id="sourceError"></div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label">Quick Platform Selection</label>
+                <div class="platform-options">
+                    <div class="platform-option" data-platform="Amazon">
+                        <div class="platform-icon">🛒</div>
+                        <div>Amazon</div>
+                    </div>
+                    <div class="platform-option" data-platform="Flipkart">
+                        <div class="platform-icon">📦</div>
+                        <div>Flipkart</div>
+                    </div>
+                    <div class="platform-option" data-platform="Myntra">
+                        <div class="platform-icon">👕</div>
+                        <div>Myntra</div>
+                    </div>
+                    <div class="platform-option" data-platform="Swiggy">
+                        <div class="platform-icon">🍕</div>
+                        <div>Swiggy</div>
+                    </div>
+                    <div class="platform-option" data-platform="Zomato">
+                        <div class="platform-icon">🍽️</div>
+                        <div>Zomato</div>
+                    </div>
+                    <div class="platform-option" data-platform="Other">
+                        <div class="platform-icon">🎁</div>
+                        <div>Other</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price" class="form-label">Price (₹) *</label>
+                    <input type="number" id="price" name="price" class="form-control" min="0" step="0.01" required>
+                    <div class="error-message" id="priceError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expiry_date" class="form-label">Expiry Date *</label>
+                    <input type="date" id="expiry_date" name="expiry_date" class="form-control" required>
+                    <div class="error-message" id="expiryError"></div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" name="description" class="form-control" rows="4" placeholder="Describe your gift card, any special offers, or additional details..."></textarea>
+                <div class="help-text">Optional: Add details about the gift card or any special offers</div>
+            </div>
+        </div>
+
+        <!-- Owner Information -->
+        <div class="form-section">
+            <h3 class="section-title">Your Information</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="owner_name" class="form-label">Your Name *</label>
+                    <input type="text" id="owner_name" name="owner_name" class="form-control" required>
+                    <div class="error-message" id="ownerNameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" required>
+                    <div class="error-message" id="phoneError"></div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="upi_id" class="form-label">UPI ID *</label>
+                <input type="text" id="upi_id" name="upi_id" class="form-control" placeholder="yourname@upi" required>
+                <div class="help-text">This is where buyers will send payment (e.g., john@okicici, jane@paytm)</div>
+                <div class="error-message" id="upiError"></div>
+            </div>
+        </div>
+
+        <!-- Card Image -->
+        <div class="form-section">
+            <h3 class="section-title">Card Image</h3>
+            
+            <div class="form-group full-width">
+                <label class="form-label">Upload Card Image *</label>
+                <div class="file-upload">
+                    <input type="file" id="image" name="image" accept="image/*" required>
+                    <label for="image" class="file-upload-label" id="fileLabel">
+                        <div>
+                            <div class="file-upload-icon">📷</div>
+                            <div class="file-upload-text">Click to upload or drag and drop</div>
+                            <div class="file-upload-text">PNG, JPG, JPEG up to 16MB</div>
+                        </div>
+                    </label>
+                </div>
+                <img id="previewImage" class="preview-image" alt="Preview">
+                <div class="error-message" id="imageError"></div>
+            </div>
+        </div>
+
+        <button type="submit" class="upload-btn" id="submitBtn">
+            <i class="fas fa-upload me-2"></i>Upload Gift Card
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.platform-option').forEach(option => {
+    option.addEventListener('click', function() {
+        document.querySelectorAll('.platform-option').forEach(opt => opt.classList.remove('selected'));
+        
+        this.classList.add('selected');
+        
+        const platform = this.getAttribute('data-platform');
+        document.getElementById('source').value = platform;
+    });
+});
+document.getElementById('image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const label = document.getElementById('fileLabel');
+    const preview = document.getElementById('previewImage');
+    
+    if (file) {
+        label.classList.add('has-file');
+        label.innerHTML = `
+            <div>
+                <div class="file-upload-icon">✅</div>
+                <div class="file-upload-text has-file">${file.name}</div>
+                <div class="file-upload-text">Click to change</div>
+            </div>
+        `;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        label.classList.remove('has-file');
+        label.innerHTML = `
+            <div>
+                <div class="file-upload-icon">📷</div>
+                <div class="file-upload-text">Click to upload or drag and drop</div>
+                <div class="file-upload-text">PNG, JPG, JPEG up to 16MB</div>
+            </div>
+        `;
+        preview.style.display = 'none';
+    }
+});
+
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    clearErrors();
+    
+    const name = document.getElementById('name').value.trim();
+    const source = document.getElementById('source').value.trim();
+    const price = parseFloat(document.getElementById('price').value);
+    const expiryDate = document.getElementById('expiry_date').value;
+    const ownerName = document.getElementById('owner_name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const upiId = document.getElementById('upi_id').value.trim();
+    const image = document.getElementById('image').files[0];
+    
+    let isValid = true;
+    
+    if (!name) {
+        showError('name', 'Card name is required');
+        isValid = false;
+    }
+    
+    if (!source) {
+        showError('source', 'Platform is required');
+        isValid = false;
+    }
+    
+    if (!price || price <= 0) {
+        showError('price', 'Please enter a valid price');
+        isValid = false;
+    }
+    
+    if (!expiryDate) {
+        showError('expiry', 'Expiry date is required');
+        isValid = false;
+    } else {
+        const today = new Date();
+        const expiry = new Date(expiryDate);
+        if (expiry <= today) {
+            showError('expiry', 'Expiry date must be in the future');
+            isValid = false;
+        }
+    }
+    
+    if (!ownerName) {
+        showError('ownerName', 'Your name is required');
+        isValid = false;
+    }
+    
+    if (!phone) {
+        showError('phone', 'Phone number is required');
+        isValid = false;
+    } else if (!isValidPhone(phone)) {
+        showError('phone', 'Please enter a valid phone number');
+        isValid = false;
+    }
+    
+    if (!upiId) {
+        showError('upi', 'UPI ID is required');
+        isValid = false;
+    } else if (!isValidUPI(upiId)) {
+        showError('upi', 'Please enter a valid UPI ID');
+        isValid = false;
+    }
+    
+    if (!image) {
+        showError('image', 'Please select an image');
+        isValid = false;
+    } else if (!isValidImage(image)) {
+        showError('image', 'Please select a valid image file (PNG, JPG, JPEG)');
+        isValid = false;
+    }
+    
+    if (isValid) {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+        
+        this.submit();
+    }
+});
+
+function showError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(fieldId + 'Error');
+    
+    if (field) field.classList.add('error');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+}
+
+function clearErrors() {
+    const fields = ['name', 'source', 'price', 'expiry', 'ownerName', 'phone', 'upi', 'image'];
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId + 'Error');
+        
+        if (field) field.classList.remove('error');
+        if (errorDiv) errorDiv.style.display = 'none';
+    });
+}
+
+function isValidPhone(phone) {
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(phone.replace(/\s/g, ''));
+}
+
+function isValidUPI(upi) {
+    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z]{3,}$/;
+    return upiRegex.test(upi);
+}
+
+function isValidImage(file) {
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    return validTypes.includes(file.type);
+}
+</script>
+{% endblock %} 

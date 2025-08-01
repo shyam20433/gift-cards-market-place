@@ -1,0 +1,545 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Gift Card - Gift Card Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .upload-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .upload-header h1 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-header p {
+        color: #6b7280;
+        font-size: 1.1rem;
+    }
+
+    .upload-form {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .upload-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+    }
+
+    .form-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #374151;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-control.error {
+        border-color: #ef4444;
+    }
+
+    .error-message {
+        color: #ef4444;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .file-upload {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .file-upload input[type=file] {
+        position: absolute;
+        left: -9999px;
+    }
+
+    .file-upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        border: 2px dashed #d1d5db;
+        border-radius: 10px;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .file-upload-label:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .file-upload-label.has-file {
+        border-color: #10b981;
+        background: #ecfdf5;
+    }
+
+    .file-upload-icon {
+        font-size: 2rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+
+    .file-upload-text {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .file-upload-text.has-file {
+        color: #10b981;
+        font-weight: 500;
+    }
+
+    .preview-image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 10px;
+        margin-top: 1rem;
+        display: block;
+    }
+
+    .current-image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 10px;
+        margin-top: 1rem;
+        border: 2px solid #e5e7eb;
+    }
+
+    .upload-btn {
+        width: 100%;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .upload-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .platform-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .platform-option {
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .platform-option:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .platform-option.selected {
+        border-color: #3b82f6;
+        background: #eff6ff;
+        color: #3b82f6;
+    }
+
+    .platform-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .help-text {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .cancel-btn {
+        flex: 1;
+        background: #6b7280;
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .cancel-btn:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+    }
+
+    .update-btn {
+        flex: 2;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .update-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .upload-container {
+            padding: 1rem;
+        }
+        
+        .upload-form {
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <div class="upload-header">
+        <h1>Edit Gift Card</h1>
+        <p>Update your gift card information</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="editForm" class="upload-form">
+        <!-- Card Information -->
+        <div class="form-section">
+            <h3 class="section-title">Card Information</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name" class="form-label">Card Name *</label>
+                    <input type="text" id="name" name="name" class="form-control" value="{{ card.card_name }}" required>
+                    <div class="error-message" id="nameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="source" class="form-label">Platform/Source *</label>
+                    <input type="text" id="source" name="source" class="form-control" value="{{ card.platform }}" required>
+                    <div class="error-message" id="sourceError"></div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label">Quick Platform Selection</label>
+                <div class="platform-options">
+                    <div class="platform-option" data-platform="Amazon">
+                        <div class="platform-icon">🛒</div>
+                        <div>Amazon</div>
+                    </div>
+                    <div class="platform-option" data-platform="Flipkart">
+                        <div class="platform-icon">📦</div>
+                        <div>Flipkart</div>
+                    </div>
+                    <div class="platform-option" data-platform="Myntra">
+                        <div class="platform-icon">👕</div>
+                        <div>Myntra</div>
+                    </div>
+                    <div class="platform-option" data-platform="Swiggy">
+                        <div class="platform-icon">🍕</div>
+                        <div>Swiggy</div>
+                    </div>
+                    <div class="platform-option" data-platform="Zomato">
+                        <div class="platform-icon">🍽️</div>
+                        <div>Zomato</div>
+                    </div>
+                    <div class="platform-option" data-platform="Other">
+                        <div class="platform-icon">🎁</div>
+                        <div>Other</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price" class="form-label">Price (₹) *</label>
+                    <input type="number" id="price" name="price" class="form-control" min="0" step="0.01" value="{{ card.price }}" required>
+                    <div class="error-message" id="priceError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expiry_date" class="form-label">Expiry Date *</label>
+                    <input type="date" id="expiry_date" name="expiry_date" class="form-control" value="{{ card.expiry_date }}" required>
+                    <div class="error-message" id="expiryError"></div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" name="description" class="form-control" rows="4" placeholder="Describe your gift card, any special offers, or additional details...">{{ card.discount_description or '' }}</textarea>
+                <div class="help-text">Optional: Add details about the gift card or any special offers</div>
+            </div>
+        </div>
+
+        <!-- Owner Information -->
+        <div class="form-section">
+            <h3 class="section-title">Your Information</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="owner_name" class="form-label">Your Name *</label>
+                    <input type="text" id="owner_name" name="owner_name" class="form-control" value="{{ card.owner_name }}" required>
+                    <div class="error-message" id="ownerNameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" value="{{ card.owner_phone }}" required>
+                    <div class="error-message" id="phoneError"></div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="upi_id" class="form-label">UPI ID *</label>
+                <input type="text" id="upi_id" name="upi_id" class="form-control" placeholder="yourname@upi" value="{{ card.owner_upi_id }}" required>
+                <div class="help-text">This is where buyers will send payment (e.g., john@okicici, jane@paytm)</div>
+                <div class="error-message" id="upiError"></div>
+            </div>
+        </div>
+
+        <!-- Card Image -->
+        <div class="form-section">
+            <h3 class="section-title">Card Image</h3>
+            
+            <div class="form-group full-width">
+                <label class="form-label">Current Image</label>
+                {% if card.image_url %}
+                <img src="{{ url_for('uploaded_file', filename=card.image_url) }}" alt="Current card image" class="current-image">
+                {% else %}
+                <p style="color: #6b7280; font-style: italic;">No image uploaded</p>
+                {% endif %}
+            </div>
+            
+            <div class="form-group full-width">
+                <label class="form-label">Upload New Image (Optional)</label>
+                <div class="file-upload">
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <label for="image" class="file-upload-label" id="fileLabel">
+                        <div>
+                            <div class="file-upload-icon">📷</div>
+                            <div class="file-upload-text">Click to upload or drag and drop</div>
+                            <div class="file-upload-text">PNG, JPG, JPEG up to 16MB</div>
+                        </div>
+                    </label>
+                </div>
+                <img id="previewImage" class="preview-image" alt="Preview" style="display: none;">
+                <div class="help-text">Leave empty to keep the current image</div>
+                <div class="error-message" id="imageError"></div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{{ url_for('dashboard') }}" class="cancel-btn">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+            <button type="submit" class="update-btn" id="submitBtn">
+                <i class="fas fa-save me-2"></i>Update Gift Card
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Set selected platform based on current value
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPlatform = '{{ card.platform }}';
+    document.querySelectorAll('.platform-option').forEach(option => {
+        if (option.getAttribute('data-platform') === currentPlatform) {
+            option.classList.add('selected');
+        }
+    });
+});
+
+document.querySelectorAll('.platform-option').forEach(option => {
+    option.addEventListener('click', function() {
+        document.querySelectorAll('.platform-option').forEach(opt => opt.classList.remove('selected'));
+        
+        this.classList.add('selected');
+        
+        const platform = this.getAttribute('data-platform');
+        document.getElementById('source').value = platform;
+    });
+});
+
+document.getElementById('image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('previewImage');
+    const label = document.getElementById('fileLabel');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            label.classList.add('has-file');
+            label.querySelector('.file-upload-text').textContent = file.name;
+            label.querySelector('.file-upload-text').classList.add('has-file');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+        label.classList.remove('has-file');
+        label.querySelector('.file-upload-text').textContent = 'Click to upload or drag and drop';
+        label.querySelector('.file-upload-text').classList.remove('has-file');
+    }
+});
+
+document.getElementById('editForm').addEventListener('submit', function(e) {
+    let isValid = true;
+    
+    document.querySelectorAll('.error-message').forEach(error => {
+        error.style.display = 'none';
+    });
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.classList.remove('error');
+    });
+    
+    const requiredFields = ['name', 'source', 'price', 'expiry_date', 'owner_name', 'phone', 'upi_id'];
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (!field.value.trim()) {
+            field.classList.add('error');
+            document.getElementById(fieldId + 'Error').textContent = 'This field is required';
+            document.getElementById(fieldId + 'Error').style.display = 'block';
+            isValid = false;
+        }
+    });
+    
+    const price = document.getElementById('price').value;
+    if (price && parseFloat(price) < 0) {
+        document.getElementById('price').classList.add('error');
+        document.getElementById('priceError').textContent = 'Price must be positive';
+        document.getElementById('priceError').style.display = 'block';
+        isValid = false;
+    }
+    
+    const expiryDate = document.getElementById('expiry_date').value;
+    if (expiryDate) {
+        const today = new Date();
+        const expiry = new Date(expiryDate);
+        if (expiry < today) {
+            document.getElementById('expiry_date').classList.add('error');
+            document.getElementById('expiryError').textContent = 'Expiry date cannot be in the past';
+            document.getElementById('expiryError').style.display = 'block';
+            isValid = false;
+        }
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
+    }
+});
+</script>
+{% endblock %} 

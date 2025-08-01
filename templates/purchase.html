@@ -1,0 +1,551 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase Gift Card - Gift Card Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .purchase-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .purchase-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .purchase-header h1 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .purchase-header p {
+        color: #6b7280;
+        font-size: 1.1rem;
+    }
+
+    .purchase-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .purchase-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(to right, #3b82f6, #10b981);
+    }
+
+    .card-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .card-info h3 {
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0;
+    }
+
+    .info-label {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .price-highlight {
+        background: linear-gradient(to right, #3b82f6, #10b981);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .price-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .price-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .payment-section {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .payment-section h3 {
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .qr-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .qr-code {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1rem;
+        background: white;
+    }
+
+    .qr-code img {
+        max-width: 200px;
+        height: auto;
+    }
+
+    .payment-steps {
+        background: #f9fafb;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .step:last-child {
+        margin-bottom: 0;
+    }
+
+    .step-number {
+        background: #3b82f6;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .step-text {
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, #3b82f6, #10b981);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .loading-spinner {
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .success-message {
+        display: none;
+        background: #d1fae5;
+        color: #065f46;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .error-message {
+        display: none;
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .purchase-container {
+            padding: 1rem;
+        }
+        
+        .card-details {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="purchase-container">
+    <div class="purchase-header">
+        <h1>Purchase Gift Card</h1>
+        <p>Complete your purchase by scanning the QR code</p>
+    </div>
+
+    <div class="purchase-card">
+        <div class="card-details">
+            <div class="card-info">
+                <h3>Card Information</h3>
+                <div class="info-item">
+                    <span class="info-label">Card Name:</span>
+                    <span class="info-value">{{ card.card_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Platform:</span>
+                    <span class="info-value">{{ card.platform }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Expiry Date:</span>
+                    <span class="info-value">{{ card.expiry_date }}</span>
+                </div>
+                {% if card.discount_description %}
+                <div class="info-item">
+                    <span class="info-label">Description:</span>
+                    <span class="info-value">{{ card.discount_description }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-info">
+                <h3>Seller Information</h3>
+                <div class="info-item">
+                    <span class="info-label">Seller Name:</span>
+                    <span class="info-value">{{ card.owner_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Phone:</span>
+                    <span class="info-value">{{ card.owner_phone }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">UPI ID:</span>
+                    <span class="info-value">{{ card.owner_upi_id }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="price-highlight">
+            <div class="price-amount">₹{{ card.price }}</div>
+            <div class="price-label">Total Amount to Pay</div>
+        </div>
+
+        <div class="payment-section">
+            <h3>Payment Instructions</h3>
+            
+            <div class="payment-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Click "Generate QR Code" to create a payment QR code</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Scan the QR code with any UPI app (Google Pay, PhonePe, Paytm, etc.)</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Complete the payment to the seller's UPI ID</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Click "Verify Payment" to confirm your purchase</div>
+                </div>
+            </div>
+
+            <div class="qr-container" id="qrContainer" style="display: none;">
+                <div class="qr-code">
+                    <img id="qrImage" src="" alt="Payment QR Code">
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Generating QR code...</p>
+            </div>
+
+            <div class="success-message" id="successMessage"></div>
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="generateQRBtn" onclick="generateQR()">
+                    <i class="fas fa-qrcode me-2"></i>Generate QR Code
+                </button>
+                
+                <button class="btn btn-secondary" id="verifyPaymentBtn" onclick="verifyPayment()" style="display: none;">
+                    <i class="fas fa-check me-2"></i>Verify Payment
+                </button>
+                
+                <button class="btn btn-danger" id="cancelBtn" onclick="cancelPurchase()" style="display: none;">
+                    <i class="fas fa-times me-2"></i>Cancel Purchase
+                </button>
+                
+                <a href="{{ url_for('home') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const cardId = '{{ card._id }}';
+let qrGenerated = false;
+
+function showMessage(type, message) {
+    const successMsg = document.getElementById('successMessage');
+    const errorMsg = document.getElementById('errorMessage');
+    
+    successMsg.style.display = 'none';
+    errorMsg.style.display = 'none';
+    
+    if (type === 'success') {
+        successMsg.textContent = message;
+        successMsg.style.display = 'block';
+    } else {
+        errorMsg.textContent = message;
+        errorMsg.style.display = 'block';
+    }
+}
+
+function showLoading(show) {
+    const loading = document.getElementById('loading');
+    const qrContainer = document.getElementById('qrContainer');
+    
+    if (show) {
+        loading.style.display = 'block';
+        qrContainer.style.display = 'none';
+    } else {
+        loading.style.display = 'none';
+    }
+}
+
+function generateQR() {
+    showLoading(true);
+    showMessage('', '');
+    
+    console.log('Generating QR for card ID:', cardId);
+    
+    fetch(`/api/initiate-purchase/${cardId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        showLoading(false);
+        console.log('Response data:', data);
+        
+        if (data.error) {
+            showMessage('error', data.error);
+            console.error('Server error:', data.error);
+        } else {
+            console.log('QR URL:', data.qr_code_url);
+            document.getElementById('qrImage').src = data.qr_code_url;
+            document.getElementById('qrContainer').style.display = 'block';
+            document.getElementById('generateQRBtn').style.display = 'none';
+            document.getElementById('verifyPaymentBtn').style.display = 'inline-flex';
+            document.getElementById('cancelBtn').style.display = 'inline-flex';
+            
+            qrGenerated = true;
+            showMessage('success', 'QR code generated successfully! Scan it with any UPI app to make payment.');
+        }
+    })
+    .catch(error => {
+        showLoading(false);
+        showMessage('error', 'Failed to generate QR code. Please try again.');
+        console.error('Fetch error:', error);
+    });
+}
+
+function verifyPayment() {
+    if (!qrGenerated) {
+        showMessage('error', 'Please generate QR code first');
+        return;
+    }
+    
+    if (confirm('Have you completed the payment? Click OK to verify your purchase.')) {
+        showLoading(true);
+        showMessage('', '');
+        
+        fetch(`/api/verify-payment/${cardId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            showLoading(false);
+            
+            if (data.error) {
+                showMessage('error', data.error);
+            } else {
+                showMessage('success', 'Payment verified successfully! The gift card is now yours.');
+                document.getElementById('verifyPaymentBtn').style.display = 'none';
+                document.getElementById('cancelBtn').style.display = 'none';
+                
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 3000);
+            }
+        })
+        .catch(error => {
+            showLoading(false);
+            showMessage('error', 'Failed to verify payment. Please try again.');
+            console.error('Error:', error);
+        });
+    }
+}
+
+function cancelPurchase() {
+    if (confirm('Are you sure you want to cancel this purchase?')) {
+        showLoading(true);
+        showMessage('', '');
+        
+        fetch(`/api/cancel-purchase/${cardId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            showLoading(false);
+            
+            if (data.error) {
+                showMessage('error', data.error);
+            } else {
+                showMessage('success', 'Purchase cancelled successfully!');
+                document.getElementById('qrContainer').style.display = 'none';
+                document.getElementById('generateQRBtn').style.display = 'inline-flex';
+                document.getElementById('verifyPaymentBtn').style.display = 'none';
+                document.getElementById('cancelBtn').style.display = 'none';
+                
+                qrGenerated = false;
+                
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            }
+        })
+        .catch(error => {
+            showLoading(false);
+            showMessage('error', 'Failed to cancel purchase. Please try again.');
+            console.error('Error:', error);
+        });
+    }
+}
+</script>
+{% endblock %} 

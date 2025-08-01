@@ -1,0 +1,588 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Gift Card Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .dashboard-header h1 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-header p {
+        color: #6b7280;
+        font-size: 1.1rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .uploaded-icon { color: #3b82f6; }
+    .purchased-icon { color: #10b981; }
+    .pending-icon { color: #f59e0b; }
+    .earnings-icon { color: #8b5cf6; }
+
+    .tabs {
+        display: flex;
+        background: #f3f4f6;
+        border-radius: 10px;
+        padding: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .tab {
+        flex: 1;
+        padding: 0.75rem 1.5rem;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        color: #6b7280;
+    }
+
+    .tab.active {
+        background: white;
+        color: #3b82f6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+    .card-item {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        transition: box-shadow 0.3s;
+        position: relative;
+        padding: 0;
+    }
+    .card-item:hover {
+        box-shadow: 0 8px 32px rgba(59,130,246,0.12);
+    }
+    .flip-container {
+        width: 100%;
+        min-height: 320px;
+        perspective: 1200px;
+        position: relative;
+        border-radius: 16px 16px 0 0;
+        cursor: pointer;
+        background: #f8fafc;
+    }
+    .flip-inner {
+        width: 100%;
+        min-height: 320px;
+        transition: transform 0.7s cubic-bezier(.4,2,.6,1);
+        transform-style: preserve-3d;
+        position: relative;
+        border-radius: 16px 16px 0 0;
+    }
+    .flipped {
+        transform: rotateY(180deg);
+    }
+    .flip-front, .flip-back {
+        position: absolute;
+        width: 100%;
+        min-height: 320px;
+        top: 0;
+        left: 0;
+        backface-visibility: hidden;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1.5rem;
+        box-sizing: border-box;
+    }
+    .flip-front {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        text-align: center;
+    }
+    .flip-front h4 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        letter-spacing: 1px;
+    }
+    .flip-front p {
+        font-size: 1.1rem;
+        margin: 0.5rem 0;
+        font-weight: 500;
+    }
+    .flip-front .label {
+        display: inline-block;
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        padding: 0.25rem 0.9rem;
+        font-size: 0.95rem;
+        margin-bottom: 0.7rem;
+        font-weight: 600;
+    }
+    .flip-back {
+        background: #fff;
+        transform: rotateY(180deg);
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+    .flip-back img {
+        max-width: 100%;
+        max-height: 400px;
+        width: auto;
+        height: auto;
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+        display: block;
+        margin: 0 auto;
+        background: #f3f4f6;
+        object-fit: contain;
+    }
+    .flip-back .no-image {
+        color: #888;
+        font-size: 1.2rem;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .card-actions {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        z-index: 10;
+    }
+    
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .edit-btn {
+        background: #3b82f6;
+    }
+    
+    .edit-btn:hover {
+        background: #2563eb;
+        transform: scale(1.1);
+    }
+    
+    .delete-btn {
+        background: #ef4444;
+    }
+    
+    .delete-btn:hover {
+        background: #dc2626;
+        transform: scale(1.1);
+    }
+    
+    .action-btn.disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .action-btn.disabled:hover {
+        background: #9ca3af;
+        transform: none;
+    }
+    
+    .delete-confirm {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .delete-confirm.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .delete-modal {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .delete-modal h3 {
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .delete-modal p {
+        color: #6b7280;
+        margin-bottom: 2rem;
+    }
+    
+    .delete-modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .delete-modal-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .delete-cancel-btn {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    
+    .delete-cancel-btn:hover {
+        background: #d1d5db;
+    }
+    
+    .delete-confirm-btn {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .delete-confirm-btn:hover {
+        background: #dc2626;
+    }
+    
+    @media (max-width: 600px) {
+        .flip-container, .flip-inner, .flip-front, .flip-back {
+            min-height: 220px;
+        }
+        .flip-back img {
+            max-height: 220px;
+        }
+        
+        .card-actions {
+            top: 0.5rem;
+            right: 0.5rem;
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+    }
+    .action-btn.upload-horizontal {
+        width: auto !important;
+        height: auto !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        font-size: 1rem !important;
+        padding: 0.75rem 1.5rem !important;
+        background: linear-gradient(to right, #3b82f6, #10b981) !important;
+        color: white !important;
+        white-space: nowrap !important;
+        box-shadow: 0 4px 15px rgba(59,130,246,0.08);
+    }
+    .action-btn.upload-horizontal i {
+        font-size: 1.1em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Welcome back, {{ session.username }}!</h1>
+        <p>Manage your gift cards and track your activity</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon uploaded-icon">📤</div>
+            <div class="stat-number">{{ user_cards|length }}</div>
+            <div class="stat-label">Gift Cards Uploaded</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon purchased-icon">📥</div>
+            <div class="stat-number">{{ purchased_cards|length }}</div>
+            <div class="stat-label">Gift Cards Purchased</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon pending-icon">⏳</div>
+            <div class="stat-number">{{ user_cards|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+            <div class="stat-label">Pending Sales</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon earnings-icon">💰</div>
+            <div class="stat-number">₹{{ user_cards|selectattr('status', 'equalto', 'purchased')|sum(attribute='price') }}</div>
+            <div class="stat-label">Total Earnings</div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('uploaded')">My Gift Cards</div>
+        <div class="tab" onclick="switchTab('purchased')">My Purchases</div>
+    </div>
+
+    <div id="uploaded-tab" class="tab-content active">
+        {% if user_cards %}
+        <div class="cards-grid">
+            {% for card in user_cards %}
+            <div class="card-item">
+                <div class="card-actions">
+                    {% if card.status != 'purchased' %}
+                    <a href="{{ url_for('edit_card', card_id=card._id) }}" class="action-btn edit-btn" title="Edit Gift Card">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button class="action-btn delete-btn" onclick="confirmDelete('{{ card._id }}', '{{ card.card_name }}')" title="Delete Gift Card">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    {% else %}
+                    <button class="action-btn disabled" title="Cannot edit purchased card">
+                        <i class="fas fa-lock"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <div class="flip-container" onclick="flipCard(this)">
+                    <div class="flip-inner">
+                      
+                        <div class="flip-front">
+                            <h4>{{ card.card_name }}</h4>
+                            <span class="label">{{ card.platform }}</span>
+                            <p><strong>Price:</strong> ₹{{ card.price }}</p>
+                            <p><strong>Status:</strong> {{ card.status.title() }}</p>
+                            <p><strong>Expires:</strong> {{ card.expiry_date }}</p>
+                        </div>
+                        <div class="flip-back">
+                            {% if card.image_url %}
+                            <img src="{{ url_for('uploaded_file', filename=card.image_url) }}" alt="{{ card.card_name }}">
+                            {% else %}
+                            <div class="no-image">No Image Available</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No Gift Cards Uploaded Yet</h3>
+            <p>Start by uploading your first gift card to the marketplace</p>
+            <a href="{{ url_for('upload_card') }}" class="action-btn upload-horizontal" style="margin-top:1rem;">
+                <i class="fas fa-plus"></i>Upload Your First Gift Card
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="purchased-tab" class="tab-content">
+        {% if purchased_cards %}
+        <div class="cards-grid">
+            {% for card in purchased_cards %}
+            <div class="card-item">
+                <div class="flip-container" onclick="flipCard(this)">
+                    <div class="flip-inner">
+                        <div class="flip-front">
+                            <h4>{{ card.card_name }}</h4>
+                            <span class="label">{{ card.platform }}</span>
+                            <p><strong>Price:</strong> ₹{{ card.price }}</p>
+                            <p><strong>Seller:</strong> {{ card.owner_name }}</p>
+                            <p><strong>Purchased:</strong> {{ card.purchased_at.strftime('%B %d, %Y') if card.purchased_at else 'Unknown' }}</p>
+                        </div>
+                        <div class="flip-back">
+                            {% if card.image_url %}
+                            <img src="{{ url_for('uploaded_file', filename=card.image_url) }}" alt="{{ card.card_name }}">
+                            {% else %}
+                            <div class="no-image">No Image Available</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No Purchases Yet</h3>
+            <p>Browse the marketplace to find gift cards you'd like to purchase</p>
+            <a href="{{ url_for('home') }}" class="action-btn upload-horizontal" style="margin-top:1rem;">
+                <i class="fas fa-search"></i>Browse Gift Cards
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="delete-confirm" id="deleteConfirm">
+    <div class="delete-modal">
+        <h3>Delete Gift Card</h3>
+        <p>Are you sure you want to delete "<span id="deleteCardName"></span>"? This action cannot be undone.</p>
+        <div class="delete-modal-buttons">
+            <button class="delete-modal-btn delete-cancel-btn" onclick="hideDeleteConfirm()">Cancel</button>
+            <button class="delete-modal-btn delete-confirm-btn" onclick="deleteCard()">Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let cardToDelete = null;
+
+function flipCard(container) {
+    const inner = container.querySelector('.flip-inner');
+    inner.classList.toggle('flipped');
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+}
+
+function confirmDelete(cardId, cardName) {
+    cardToDelete = cardId;
+    document.getElementById('deleteCardName').textContent = cardName;
+    document.getElementById('deleteConfirm').classList.add('show');
+}
+
+function hideDeleteConfirm() {
+    document.getElementById('deleteConfirm').classList.remove('show');
+    cardToDelete = null;
+}
+
+function deleteCard() {
+    if (!cardToDelete) return;
+    
+    fetch(`/delete-card/${cardToDelete}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            const cardElement = document.querySelector(`[onclick="confirmDelete('${cardToDelete}', '${document.getElementById('deleteCardName').textContent}')"]`).closest('.card-item');
+            cardElement.remove();
+            updateStats();
+            alert('Card deleted successfully!');
+        }
+        hideDeleteConfirm();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the card.');
+        hideDeleteConfirm();
+    });
+}
+
+function updateStats() {
+    const uploadedCards = document.querySelectorAll('#uploaded-tab .card-item').length;
+    const uploadedCount = document.querySelector('.stat-card:nth-child(1) .stat-number');
+    if (uploadedCount) {
+        uploadedCount.textContent = uploadedCards;
+    }
+    const pendingCards = document.querySelectorAll('#uploaded-tab .card-item').length;
+    const pendingCount = document.querySelector('.stat-card:nth-child(3) .stat-number');
+    if (pendingCount) {
+        pendingCount.textContent = pendingCards;
+    }
+}
+document.getElementById('deleteConfirm').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideDeleteConfirm();
+    }
+});
+</script>
+{% endblock %}
